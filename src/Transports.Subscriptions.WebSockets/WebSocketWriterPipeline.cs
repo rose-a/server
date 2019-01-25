@@ -31,7 +31,7 @@ namespace GraphQL.Server.Transports.WebSockets
 
         public Task SendAsync(OperationMessage message)
         {
-            _logger?.LogDebug("message {messageId} send to pipeline", message.Id);
+            _logger?.LogDebug("message {messageId} sent to pipeline", message.Id);
             return _startBlock.SendAsync(message);
         }
 
