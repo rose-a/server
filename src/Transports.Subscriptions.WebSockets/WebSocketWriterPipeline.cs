@@ -25,11 +25,13 @@ namespace GraphQL.Server.Transports.WebSockets
 
         public bool Post(OperationMessage message)
         {
+            _logger?.LogDebug("message {messageId} posted to pipeline", message.Id);
             return _startBlock.Post(message);
         }
 
         public Task SendAsync(OperationMessage message)
         {
+            _logger?.LogDebug("message {messageId} send to pipeline", message.Id);
             return _startBlock.SendAsync(message);
         }
 
@@ -46,7 +48,6 @@ namespace GraphQL.Server.Transports.WebSockets
             var target = new ActionBlock<OperationMessage>(
                 WriteMessageAsync, new ExecutionDataflowBlockOptions
                 {
-                    BoundedCapacity = 1,
                     MaxDegreeOfParallelism = 1,
                     EnsureOrdered = true
                 });
