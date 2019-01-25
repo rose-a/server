@@ -223,7 +223,7 @@ namespace GraphQL.Server.Transports.WebSockets.Tests
                 {
                     ContractResolver = contractResolver,
                     NullValueHandling = NullValueHandling.Ignore
-                }));
+                }), null);
         }
     }
 }

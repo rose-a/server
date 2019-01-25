@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using GraphQL.Http;
 using GraphQL.Server.Transports.Subscriptions.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.Server.Transports.WebSockets
 {
@@ -10,12 +11,14 @@ namespace GraphQL.Server.Transports.WebSockets
     {
         private readonly WebSocket _socket;
         private readonly IDocumentWriter _documentWriter;
+        private readonly ILogger<WebSocketWriterPipeline> _logger;
         private readonly ITargetBlock<OperationMessage> _startBlock;
 
-        public WebSocketWriterPipeline(WebSocket socket, IDocumentWriter documentWriter)
+        public WebSocketWriterPipeline(WebSocket socket, IDocumentWriter documentWriter, ILogger<WebSocketWriterPipeline> logger)
         {
             _socket = socket;
             _documentWriter = documentWriter;
+            _logger = logger;
 
             _startBlock = CreateMessageWriter();
         }
@@ -55,10 +58,12 @@ namespace GraphQL.Server.Transports.WebSockets
         {
             if (_socket.CloseStatus.HasValue) return;
 
+            _logger?.LogDebug("writing message {messageId} to websocket", message.Id);
             var stream = new WebsocketWriterStream(_socket);
             try
             {
                 await _documentWriter.WriteAsync(stream, message);
+                _logger?.LogDebug("message {messageId} completely written to websocket", message.Id);
             }
             finally
             {

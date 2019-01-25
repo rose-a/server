@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Http;
 using GraphQL.Server.Transports.Subscriptions.Abstractions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -11,10 +12,13 @@ namespace GraphQL.Server.Transports.WebSockets
     public class WebSocketTransport : IMessageTransport
     {
         private readonly WebSocket _socket;
+        private readonly ILoggerFactory _loggerFactory;
+        private ILogger<WebSocketTransport> _logger;
 
-        public WebSocketTransport(WebSocket socket, IDocumentWriter documentWriter)
+        public WebSocketTransport(WebSocket socket, IDocumentWriter documentWriter, ILoggerFactory loggerFactory)
         {
             _socket = socket;
+            _loggerFactory = loggerFactory;
             var serializerSettings = new JsonSerializerSettings
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -23,7 +27,7 @@ namespace GraphQL.Server.Transports.WebSockets
             };
 
             Reader = new WebSocketReaderPipeline(_socket, serializerSettings);
-            Writer = new WebSocketWriterPipeline(_socket, documentWriter);
+            Writer = new WebSocketWriterPipeline(_socket, documentWriter, _loggerFactory.CreateLogger<WebSocketWriterPipeline>());
         }
 
 

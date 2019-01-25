@@ -34,7 +34,7 @@ namespace GraphQL.Server.Transports.WebSockets
         {
             _logger.LogDebug("Creating server for connection {connectionId}", connectionId);
 
-            var transport = new WebSocketTransport(socket, _documentWriter);
+            var transport = new WebSocketTransport(socket, _documentWriter, _loggerFactory);
             var manager = new SubscriptionManager(_executer, _loggerFactory);
             var server = new SubscriptionServer(
                 transport,
